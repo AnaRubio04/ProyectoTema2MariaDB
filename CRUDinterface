@@ -1,0 +1,26 @@
+import java.sql.Connection;
+import java.util.Date;
+import java.util.Map;
+
+/**
+ *
+ * @author Diurno
+ */
+public interface iGestion {
+
+    void insertarProveedor(Connection conn, String nombre, int contacto, String email, String direccion);
+
+    void insertarCompra(Connection conn, Date fecha, int idProveedor);
+
+    void actualizarPrecioProducto(Connection conn, int idProducto, double nuevoPrecio);
+
+    void modificarCompra(Connection conn, int idCompra, Date fecha, int idProveedor);
+
+    void eliminarProveedor(Connection conn, int idProveedor);
+
+    void consultarCompraPorProveedor(Connection conn, int idProveedor);
+
+    void consultarCompraPorFecha(Connection conn, Date fecha);
+
+    Map<Integer, String> consultarProveedor(Connection conn);
+}
