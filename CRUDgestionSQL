@@ -1,0 +1,120 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *
+ * @author Diurno
+ */
+public class gestionSQL implements iGestion {
+
+    @Override
+    public void insertarProveedor(Connection conn, String nombre, int contacto, String email, String direccion) {
+        String sql = "INSERT INTO proveedores (nombre,contacto,email,direccion) VALUES (?,?,?,?)";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nombre);
+            stmt.setInt(2, contacto);
+            stmt.setString(3, email);
+            stmt.setString(4, direccion);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("Error al insertar el usuario: " + ex.getMessage());
+        }
+
+    }
+
+    @Override
+    public void insertarCompra(Connection conn, Date fecha, int idProveedor) {
+        String sql = "INSERT INTO compras (fecha,id_proveedor) VALUES (?,?)";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setDate(1, (java.sql.Date) fecha);
+            stmt.setInt(2, idProveedor);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al insertar la compra: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void actualizarPrecioProducto(Connection conn, int idProducto, double nuevoPrecio) {
+        String sql = "UPDATE productos SET precio_unitario=? WHERE id_producto=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setDouble(1, nuevoPrecio);
+            stmt.setInt(2, idProducto);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("No se ha podido actualizar el producto: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void modificarCompra(Connection conn, int idCompra, Date fecha, int idProveedor) {
+        String sql = "UPDATE compras SET id_proveedor=? , fecha=? WHERE id_compra=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idProveedor);
+            stmt.setDate(2, (java.sql.Date) fecha);
+            stmt.setInt(3, idCompra);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("No se ha podido modificar la compra: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void eliminarProveedor(Connection conn, int idProveedor) {
+        String sql = "DELETE FROM proveedores WHERE id_proveedor=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idProveedor);
+        } catch (SQLException e) {
+            System.err.println("No se ha podido eliminar el proveedor: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void consultarCompraPorProveedor(Connection conn, int idProveedor) {
+        String sql = "SELECT * FROM compras WHERE id_proveedor=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idProveedor);
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+    }
+
+    @Override
+    public void consultarCompraPorFecha(Connection conn, Date fecha) {
+        String sql = "SELECT * FROM compras WHERE fecha=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setDate(1, (java.sql.Date) fecha);
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+    }
+
+    @Override
+    public Map<Integer, String> consultarProveedor(Connection conn) {
+        Map<Integer, String> proveedores = new HashMap<>();
+        String sql = "SELECT id_proveedor,nombre FROM proveedores";
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                proveedores.put(rs.getInt("id_proveedor"), rs.getString("nombre"));
+            }
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        return proveedores;
+    }
+
+}
